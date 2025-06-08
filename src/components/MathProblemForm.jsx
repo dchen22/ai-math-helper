@@ -1,10 +1,10 @@
 // src/components/MathProblemForm.jsx
 import React, { useState } from 'react'
-import { Card } from "./ui/card.tsx"
-import { CardContent } from "./ui/card-content.tsx"
-import { Textarea } from "./ui/textarea.tsx"
-import { Input } from "./ui/input.tsx"
-import { Button } from "./ui/button.tsx"
+import Card from "./ui/Card.jsx"
+import CardContent from "./ui/CardContent.jsx"
+import Textarea from "./ui/Textarea.jsx"
+import Input from "./ui/Input.jsx"
+import Button from "./ui/Button.jsx"
 import { motion } from 'framer-motion'
 
 export default function MathProblemForm() {
