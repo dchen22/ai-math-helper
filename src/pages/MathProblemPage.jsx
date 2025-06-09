@@ -20,7 +20,7 @@ export default function MathProblemPage() {
             const data = {
                 code: latex
             };
-
+            console.error("Blabla")
             const response = await fetch('http://localhost:4000/api/analyze', {
                 method: 'POST',
                 headers: {

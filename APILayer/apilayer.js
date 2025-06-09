@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import { analyzeMathProblem } from './mathAnalyzer.js';
 import dotenv from 'dotenv';
+import multer from 'multer';
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Load environment variables from .env file
 dotenv.config({ path: '.env' });
@@ -28,32 +33,42 @@ app.use(express.json());
 
 // POST /api/submit-code
 // Expects JSON payload: { code: string }
-app.post('/api/submit-code', async (req, res) => {
+app.post('/api/analyze', upload.single('file'), async (req, res) => {
     try {
-      const { code } = req.body;
-      if (!code) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'No problem provided' 
-        });
-      }
+        // Get the text input if present
+        const text = req.body.code || '';
+        
+        // Convert image to base64 if present
+        let image = '';
+        if (req.file) {
+            image = req.file.buffer.toString('base64');
+            console.log('Processing image file:', req.file.originalname);
+        }
 
-      console.log('Processing math problem:', code);
-      const analysis = await analyzeMathProblem(code);
-    //   const analysis = "Good"
-      return res.json({ 
-        success: true,
-        ...analysis
-      });
+        // Validate that at least one input is provided
+        if (!text && !image) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'No input provided - please provide either text or an image' 
+            });
+        }
+
+        // Analyze the problem using both inputs
+        const analysis = await analyzeMathProblem(text, image);
+        
+        return res.json({ 
+            success: true,
+            ...analysis
+        });
     } catch (err) {
-      console.error('Error processing math problem:', err);
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Failed to analyze math problem',
-        details: err.message 
-      });
+        console.error('Error processing math problem:', err);
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Failed to analyze math problem',
+            details: err.message 
+        });
     }
-  });
+});
 
 function detectProblemType(problem) {
     // TODO: Implement actual problem type detection

@@ -21,18 +21,27 @@ export default function MathProblemForm() {
     if (loading) return; // Prevent double submissions
     setLoading(true)
     
-    const data = {
-      code: latex
-    }
-
     try {
-      const res = await fetch('http://localhost:4000/api/submit-code', {
+      const formData = new FormData();
+      
+      // Add text input if present
+      if (latex) {
+        formData.append('code', latex);
+      }
+      
+      // Add file if present
+      if (file) {
+        formData.append('file', file);
+      }
+
+      if (!formData.entries().next().value) {
+        throw new Error('No input provided - please enter text or upload a file');
+      }
+      console.log("Form data:")
+      console.log(formData)
+      const res = await fetch('http://localhost:4000/api/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
+        body: formData
       })
       
       if (!res.ok) {
@@ -72,7 +81,7 @@ export default function MathProblemForm() {
             <Input type="file" accept="image/*" onChange={handleFileChange} />
           </label>
 
-          <Button onClick={handleSubmit} disabled={loading}>
+          <Button onClick={handleSubmit} disabled={loading || (!latex && !file)}>
             {loading ? 'Processing...' : 'Submit'}
           </Button>
         </div>
