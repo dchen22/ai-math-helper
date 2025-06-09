@@ -1,6 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import { analyzeMathProblem } from './mathAnalyzer.js';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config({ path: '.env' });
+
+// Validate API key
+if (!process.env.GROQ_API_KEY) {
+    console.error('Error: GROQ_API_KEY not found in environment variables');
+    process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
